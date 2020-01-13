@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 
 import TodoForm from "./components/TodoComponents/TodoForm";
 import Todo from "./components/TodoComponents/Todo";
+
+import SearchForm from "./components/SearchComponents/SearchForm";
 
 class App extends React.Component {
   constructor() {
@@ -25,9 +27,8 @@ class App extends React.Component {
 
   componentDidMount() {
     const todoList = JSON.parse(localStorage.getItem("todoList"));
-    console.log(todoList);
     if (todoList) {
-      this.setState({ todoList, loading: false });
+      this.setState({ todoList, loading: false, filter: [] });
     } else {
       this.setState({
         todoList: [
@@ -42,7 +43,8 @@ class App extends React.Component {
             completed: false
           }
         ],
-        loading: false
+        loading: false,
+        filter: []
       });
     }
   }
@@ -82,6 +84,24 @@ class App extends React.Component {
     localStorage.setItem("todoList", JSON.stringify(this.state.todoList));
   };
 
+  renderTodoList = searchInput => {
+    this.state.todoList.map(todoObject => {
+      if (todoObject.task === searchInput.task) {
+        return (
+          <Todo
+            todoObject={todoObject}
+            handleClick={this.updateTodo}
+            key={todoObject.id}
+          />
+        );
+      }
+    });
+  };
+
+  updateFilter = filterObject => {
+    this.setState({ filter: filterObject });
+  };
+
   render() {
     return (
       <div>
@@ -92,16 +112,31 @@ class App extends React.Component {
             <TodoForm
               createTodo={this.createTodo}
               clearCompleted={this.clearCompleted}
+              setLocalStorage={this.setLocalStorage}
             />
-            {this.state.todoList.map(todoObject => {
-              return (
-                <Todo
-                  todoObject={todoObject}
-                  handleClick={this.updateTodo}
-                  key={todoObject.id}
-                />
-              );
-            })}
+            <SearchForm
+              todoObject={this.state.todoList}
+              updateFilter={this.updateFilter}
+            />
+            {this.state.filter.length > 0
+              ? this.state.filter.map(todoObject => {
+                  return (
+                    <Todo
+                      todoObject={todoObject}
+                      handleClick={this.updateTodo}
+                      key={todoObject.id}
+                    />
+                  );
+                })
+              : this.state.todoList.map(todoObject => {
+                  return (
+                    <Todo
+                      todoObject={todoObject}
+                      handleClick={this.updateTodo}
+                      key={todoObject.id}
+                    />
+                  );
+                })}
           </div>
         )}
       </div>

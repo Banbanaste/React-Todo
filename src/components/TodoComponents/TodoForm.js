@@ -5,7 +5,6 @@ const TodoForm = props => {
   const { handleSubmit, register, errors } = useForm();
   const onSubmit = value => {
     const todoObject = { ...value, id: Date.now(), completed: false };
-    console.log(todoObject);
     props.createTodo(todoObject);
     props.setLocalStorage();
   };
